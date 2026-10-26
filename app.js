@@ -14,7 +14,8 @@ const initDB = async () => {
             CREATE TABLE IF NOT EXISTS students (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE
+            email VARCHAR(255) NOT NULL UNIQUE,
+            age INT NOT NULL
             )
             `);
 
@@ -24,7 +25,7 @@ const initDB = async () => {
     }
 };
 
-initDB();
+initDB();   
 
 //Mount the student router
 app.use('/students', studentRoutes);
