@@ -1,17 +1,20 @@
 const express = require('express');
 const router = express.Router();
-
 const studentController = require('../controllers/studentController');
 
-//POST /student - Add new record
-router.post('/', studentController.createStudent );
-router.get('/', studentController.getAllStudents);
-router.get('/', studentController.getStudentById);
+// POST /students - Insert
+router.post('/', studentController.createStudent);
 
-//PUT /students/:id - Update record by ID
+// GET /students - Read All (findAll)
+router.get('/', studentController.getAllStudents);
+
+// GET /students/:id - Read One (findByPk) -> Added :id
+router.get('/:id', studentController.getStudentById);
+
+// PUT /students/:id - Update
 router.put('/:id', studentController.updateStudent);
 
-//DELETE /students/:id - Delete record by ID
+// DELETE /students/:id - Delete
 router.delete('/:id', studentController.deleteStudent);
 
-module.exports = router;   
+module.exports = router;

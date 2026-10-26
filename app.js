@@ -1,8 +1,7 @@
 const express = require('express');
 const db = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
-
-const Students = require('./models/students');
+require('./models/students');
 
 
 const app = express();
@@ -15,10 +14,11 @@ app.use('/students', studentRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-db.sync ({ force: false }).then(() => {
-app.listen(PORT, () => {
+db.sync ({ alter: true })
+.then(() => {
+  app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 })
 }).catch((err) => {
     console.log(err);
-})
+});

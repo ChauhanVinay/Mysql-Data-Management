@@ -1,116 +1,91 @@
-const db = require('../config/db');
+const Student = require('../models/students');
 
-//1. Insert a new student
+// 1. INSERT: Student.create
 exports.createStudent = async (req, res) => {
-    try {
-        const { name, email, age} = req.body;
+  try {
+    const { name, email } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: 'Name and email are required.' });
+    }
 
- if(!name || !email || age === undefined) {
- return res.status(400).json({ error: 'Name and Email and age required.'});
-      }
+    const student = await Student.create({
+      name,
+      email
+    });
 
-    const query = 'INSERT INTO students (name, email, age) VALUES (?, ?, ?)';
-const [result] = await db.execute(query, [name, email, age]);
-console.log(`[DB INSERT] Added student with ID: ${result.insertId}, Name: ${name}, Age: ${age}`);
-
-res.status(201).json({
-    message: 'Student created successfully',
-    student: { id: result.insertId, name, email, age }
-});
- } catch(error) {
-    console.error('[DB INSERT ERROR]:', error.message);
+    res.status(201).json({
+      message: 'Student created successfully',
+      student
+    });
+  } catch (error) {
     res.status(500).json({ error: error.message });
- }
+  }
 };
 
-
-//GET /students - Retrieve all students
+// 2. READ ALL: Student.findAll
 exports.getAllStudents = async (req, res) => {
-    try {
-  
-        const query = 'SELECT * FROM students';
-        const [students] = await db.query(query);
-
- console.log(`[DB SELECT] Retrieved ${students.length} students`);
- res.status(200).json({ data: students});
-         
-    } catch(error) {
-        console.error('[DB SELECT ERROR]:', error.message);
-        res.status(500).json({ error: error.message });
-    }
+  try {
+    const students = await Student.findAll();
+    res.status(200).json({ data: students });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-//GET /students/:id - Retrieve single student by ID
+// 3. READ ONE: Student.findByPk
 exports.getStudentById = async (req, res) => {
-    try {
+  try {
+    const { id } = req.params;
+    const student = await Student.findByPk(id);
 
-     const { id } = req.params;
-     const query = 'SELECT * FROM students WHERE  id = ?';
-     const [rows] = await db.execute(query, [id]);
-
-     if(rows.length === 0) {
-        console.log(`[DB SELECT] Student not found with ID: ${id}`);
-     return res.status(400).json({ error: `Student with ID: ${id} not found`  });
-     }
-
-     console.log(`[DB SELECT] Retrieved  student ID: ${id}`);
-     res.status(200).json({ data: rows[0] });
-
-    } catch (error){
-        console.error('[DB SELECT ERROR]:', error.message);
-        res.status(500).json({ error: error.message });
+    if (!student) {
+      return res.status(404).json({ error: `Student with ID ${id} not found` });
     }
+
+    res.status(200).json({ data: student });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
-//. PUT Updating existing student by ID
+// 4. UPDATE: findByPk + save
 exports.updateStudent = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { name, email, age } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
 
-        if (!name || !email || age === undefined) {
-      return res.status(400).json({ error: 'Name, email and age are required.' });
+    const student = await Student.findByPk(id); 
+    if (!student) {
+      return res.status(404).json({ error: `Student with ID ${id} not found` }); 
     }
 
- const query = 'UPDATE students SET name = ?, email = ?, age = ? WHERE id = ?';
- const [result]  = await db.execute(query, [name, email, age, id]);
-
- // Check if the student existed
-    if (result.affectedRows === 0) {
-      console.log(`[DB UPDATE] Student not found with ID: ${id}`);
-    return res.status(404).json({ error: `Student with ID ${id} not found.` });
-    }
-
-    console.log(`[DB UPDATE] Updated student ID: ${id} -> Name: ${name}, Email: ${email}, Age: ${age}`);
+    if (name) student.name = name;
+    if (email) student.email = email;
+    await student.save();
 
     res.status(200).json({
       message: 'Student updated successfully',
-      student: { id, name, email, age }
+      student
     });
-    } catch (error) {
-    console.error('[DB UPDATE ERROR]:', error.message);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-//Delete student by ID
+// 5. DELETE: Student.destroy
 exports.deleteStudent = async (req, res) => {
-    try {
-        const {id} = req.params;
+  try {
+    const { id } = req.params;
+    const rowsDeleted = await Student.destroy({
+      where: { id }
+    });
 
-        const query = 'DELETE FROM students WHERE id = ?';
-        const [result] = await db.execute(query, [id]);
-
-        // Check if the student existed
-    if (result.affectedRows === 0) {
-      console.log(`[DB DELETE] Student not found with ID: ${id}`);
-      return res.status(404).json({ error: `Student with ID ${id} not found.` });
+    if (!rowsDeleted) {
+      return res.status(404).json({ error: `Student with ID ${id} not found` });
     }
-    console.log(`[DB DELETE] Deleted student ID: ${id}`);
 
-    res.status(200).json({ message: `Student with ID ${id} deleted successfully.` });
-    } catch (error) {
-    console.error('[DB DELETE ERROR]:', error.message);
+    res.status(200).json({ message: `Student with ID ${id} deleted successfully` });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};  
+};
