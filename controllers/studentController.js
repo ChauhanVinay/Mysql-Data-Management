@@ -102,7 +102,7 @@ exports.addingValuesToStudentAndIdentityTable = async (req, res) => {
     // Create the student first
     const createdStudent = await Students.create(student);
 
-    // Create the 1:1 identity card attached to the created student
+    // Create the 1:1 identity card attached to the created student(Student + card)
     const createdCard = await IdentityCard.create({
       ...identityCard,
       studentId: createdStudent.id
