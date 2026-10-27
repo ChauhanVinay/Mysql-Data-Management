@@ -2,6 +2,8 @@ const express = require('express');
 const db = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
 require('./models/students');
+require('./models/identityCard');
+require('./models/index');
 
 
 const app = express();
@@ -22,3 +24,4 @@ db.sync ({ alter: true })
 }).catch((err) => {
     console.log(err);
 });
+   

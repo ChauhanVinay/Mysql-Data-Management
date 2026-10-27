@@ -17,4 +17,7 @@ router.put('/:id', studentController.updateStudent);
 // DELETE /students/:id - Delete
 router.delete('/:id', studentController.deleteStudent);
 
+// 1:1 Creation endpoint
+router.post('/addingStudentWithCard', studentController.addingValuesToStudentAndIdentityTable);
+
 module.exports = router;
