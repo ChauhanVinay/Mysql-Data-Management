@@ -1,9 +1,12 @@
 const express = require('express');
 const db = require('./config/db');
 const studentRoutes = require('./routes/studentRoutes');
-require('./models/students');
-require('./models/identityCard');
-require('./models/index');
+const courseRoutes = require('./routes/courseRoutes');
+// require('./models/students');
+// require('./models/identityCard');
+// require('./models/index');
+
+require('./models');
 
 
 const app = express();
@@ -13,6 +16,7 @@ app.use(express.json());
 
 //Mount the student router
 app.use('/students', studentRoutes);
+app.use('/courses', courseRoutes);
 
 const PORT = process.env.PORT || 3000;
 
